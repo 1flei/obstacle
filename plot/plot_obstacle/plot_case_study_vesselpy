@@ -1,0 +1,47 @@
+import numpy as np
+import matplotlib.pylab as plt
+import json
+import random
+from plot_obst_json_util import plot_data_obs_pnts_heatmap, plot_data_obs_pnts, getERPAtTime, plotERP, plotERPArea, get_latest_json_filename
+from plot_obst_json_util import gt_vessel0, gt_vessel1, gt_vessel2, plot_chosen_area
+from matplotlib.patches import Patch, Rectangle
+from matplotlib.lines import Line2D
+import matplotlib.patches as mpatches
+
+plt.rcParams.update({'font.size': 12})
+
+def plot_vessel():
+    fig = plt.figure(figsize=(7, 4))
+
+    filename = get_latest_json_filename(resname= 'vessel1', sigma=0.05, delta=1.5, tau=500, folder='res')
+    # filename = get_latest_json_filename(resname='sgtaxi_morning', sigma=0.02, delta=2, tau=50, folder='res')
+    with open(filename, 'r') as f:
+        datas = json.load(f)['obst']
+
+
+    # erp_morning =  getERPAtTime(t='08:00:01')
+    # erp_afternoon =  getERPAtTime(t='18:00:01')
+    # print('erp_morning=', len(erp_morning), '   erp_afternoon=', len(erp_afternoon))
+
+    # plotERP(cm='r*', t='08:00:01')
+    for i, data in enumerate(datas):
+        plot_data_obs_pnts(data, is_plot_density=False, is_plot_succ=True, alpha=0.05, color='b', ls='-', tail_color='royalblue')
+
+    
+    rect =  Patch(facecolor='w', edgecolor='b',
+                         label='Operating Region')
+    star = Line2D([0], [0], marker='*', color='w', label='Scatter',
+                        markerfacecolor='r', markersize=20)
+
+    line = Line2D([0], [0], marker='', color='b', ls='-', alpha=0.3)
+
+    plt.legend([line, rect, star], ['Trajectories in $\mathcal{C}$', 'Obstacle Regions' ,'ERP Gantries'], 
+            ncol=1, loc='lower right')
+
+    plt.tight_layout(pad=0.5, w_pad=0.5, h_pad=1.0)
+    plt.savefig('case_study_taxi_morning.pdf')
+    plt.savefig('case_study_taxi_morning.png')
+    plt.show()
+
+
+plot_vessel()
